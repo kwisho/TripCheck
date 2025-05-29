@@ -1,0 +1,74 @@
+service: tripcheck-service  # サービス名（CloudFormation スタック名の接頭辞になります）
+
+frameworkVersion: '4'  # 使用する Serverless Framework のバージョン
+
+custom:
+  stage: ${opt:stage, 'dev'}  # コマンドラインで指定しない場合のデフォルトステージ
+  region: ap-northeast-1      # 東京リージョン
+  tableName: ${self:service}-plans-${self:custom.stage}  # DynamoDB テーブル名（サービス名とステージ名で一意）
+
+provider:
+  name: aws  # 使用するクラウドプロバイダ（AWS）
+  runtime: nodejs22.x  # Lambda 関数で使う Node.js のバージョン
+  region: ${self:custom.region}  # デプロイ先のリージョン（東京）
+  memorySize: 256  # 各 Lambda 関数に割り当てるメモリサイズ（MB）
+  stage: ${self:custom.stage}  # デプロイ対象のステージ（dev など）
+
+  deploymentBucket:
+    name: tripcheck-deployment-${self:custom.stage}  # Lambda のコードを一時的に格納する S3 バケット名（ステージ名付きで一意に）
+    serverSideEncryption: AES256  # バケットの内容を AES256 でサーバー側暗号化
+
+  apiGateway:
+    shouldStartNameWithService: true  # API Gateway の名前にサービス名を付与する
+
+  httpApi:
+    cors: true  # CORS（他ドメインからのアクセス）を有効にする
+
+  iamRoleStatements:  # Lambda が AWS の他サービス（今回は DynamoDB）へアクセスするための権限設定
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - 'Fn::GetAtt': [PlanTable, Arn]  # 後述の resources で定義する PlanTable の ARN を参照
+
+  environment:
+    TABLE_NAME: ${self:custom.tableName}  # Lambda 関数内で参照可能な環境変数（DynamoDB テーブル名）
+
+plugins:
+  - serverless-deployment-bucket  # デプロイバケットをカスタマイズするためのプラグイン
+
+package:
+  individually: true  # 関数ごとに個別にパッケージングしてサイズを最適化
+  patterns:
+    - '!test/**'         # テストフォルダを除外
+    - '!src/index.ts'    # エントリーポイント以外の不要ファイルを除外
+
+functions:
+  get-plan:
+    handler: src/functions/get-plan.handler  # Lambda のエントリーポイント（例: get-plan.ts の handler 関数）
+    events:
+      - httpApi: 'GET /v1/plans'  # GET リクエストで /v1/plans にアクセスするとこの関数が呼ばれる
+
+  get-plan-by-id:
+    handler: src/functions/get-plan-by-id.handler
+    events:
+      - httpApi: 'GET /v1/plans/{id}'  # ID 指定で 1件のプラン取得
+
+  create-plan:
+    handler: src/functions/create-plan.handler
+    events:
+      - httpApi: 'POST /v1/plans'  # プランの新規作成
+
+  delete-plan:
+    handler: src/functions/delete-plan.handler
+    events:
+      - httpApi: 'DELETE /v1/plans/{id}'  # ID を指定してプランを削除
+
+resources:
+  - ${file(resources/database.yml)}  # 外部ファイルから DynamoDB テーブル（PlanTable）などを定義
