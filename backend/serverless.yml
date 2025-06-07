@@ -72,3 +72,14 @@ functions:
 
 resources:
   - ${file(resources/database.yml)}  # 外部ファイルから DynamoDB テーブル（PlanTable）などを定義
+  Resource:
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: CognitoAuthorizer
+        Type: COGNITO_USER_POOLS
+        IdentitySource: method.request.header.Authorization
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ProviderARNs:
+          - arn:aws:cognito-idp:ap-northeast-1:725123744386:userpool/ap-northeast-1_fd8pKPCYd

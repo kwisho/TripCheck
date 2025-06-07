@@ -1,22 +1,26 @@
-import { signIn } from '@/auth/signIn';
+import { signUp } from '@/auth/signUp';
 import FormButton from '@/components/common/FormButton';
 import FormInput from '@/components/common/FormInput';
-import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { Title } from 'react-native-paper';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onPressLogin = async () => {
+  const onPressRegister = async () => {
     if (!email || !password) {
       Alert.alert('エラー', 'メールアドレスとパスワードを入力してください');
       return;
     }
-
     try {
-      await signIn(email, password);
+      const message = await signUp(email, password);
+      Alert.alert('成功', message);
+      router.push({
+        pathname: '/confirm-code',
+        params: { email },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -24,7 +28,6 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Title style={styles.title}>TripCheck ログイン</Title>
       <FormInput
         label="メールアドレス"
         value={email}
@@ -32,13 +35,15 @@ export default function LoginScreen() {
         keyboardType="email-address"
         secureTextEntry={false}
       />
+
       <FormInput
         label="パスワード"
         value={password}
         onChangeText={setPassword}
         secureTextEntry={true}
       />
-      <FormButton title="ログイン" onPress={onPressLogin} disabled={!email || !password} />
+
+      <FormButton title="登録" onPress={onPressRegister} disabled={!email || !password} />
     </View>
   );
 }
@@ -46,9 +51,9 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
     padding: 24,
     justifyContent: 'center',
-    backgroundColor: '#fff',
   },
   title: {
     marginBottom: 24,
