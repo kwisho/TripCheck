@@ -1,5 +1,6 @@
 import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
 import pool from './cognitoConfig';
+import * as SecureStore from 'expo-secure-store';
 
 /**
  * ログイン処理を実施する
@@ -20,8 +21,12 @@ export const signIn = (email: string, password: string): Promise<string> => {
 
   return new Promise((resolve, reject) => {
     user.authenticateUser(authDetails, {
-      onSuccess: (result) => {
+      onSuccess: async (result) => {
+        // secure-storageに保存する
         const idToken = result.getIdToken().getJwtToken();
+        const refreshToken = result.getRefreshToken().getToken();
+        await SecureStore.setItemAsync('idToken', idToken);
+        await SecureStore.setItemAsync('refreshToken', refreshToken);
         resolve(`ログイン成功！トークン：${idToken}`);
       },
       onFailure: (err) => {
