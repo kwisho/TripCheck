@@ -1,6 +1,6 @@
-import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { isDate } from '../../src/utils/date.js'
+import assert from 'node:assert'
 
 describe('date', () => {
   it('Should validate a valid date', () => {

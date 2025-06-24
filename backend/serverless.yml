@@ -1,24 +1,24 @@
-service: tripcheck-service  # サービス名
+service: tripcheck-service # サービス名
 
-frameworkVersion: '4'  # Serverless Framework バージョン指定
+frameworkVersion: '4' # Serverless Framework バージョン指定
 
 custom:
-  stage: ${opt:stage, 'dev'}          # デフォルトステージはdev
-  region: ap-northeast-1              # 東京リージョン
-  tableName: ${self:service}-plans-${self:custom.stage}  # DynamoDB テーブル名
+  stage: ${opt:stage, 'dev'} # デフォルトステージはdev
+  region: ap-northeast-1 # 東京リージョン
+  tableName: ${self:service}-plans-${self:custom.stage} # DynamoDB テーブル名
 
 provider:
-  name: aws                          # プロバイダはAWS
-  runtime: nodejs22.x                # Lambdaランタイム
-  region: ${self:custom.region}     # リージョン設定
-  stage: ${self:custom.stage}       # ステージ設定
-  memorySize: 256                   # Lambdaのメモリ
+  name: aws # プロバイダはAWS
+  runtime: nodejs22.x # Lambdaランタイム
+  region: ${self:custom.region} # リージョン設定
+  stage: ${self:custom.stage} # ステージ設定
+  memorySize: 256 # Lambdaのメモリ
   deploymentBucket:
-    name: tripcheck-deployment-${self:custom.stage}  # デプロイ用S3バケット名
-    serverSideEncryption: AES256                      # バケットの暗号化
+    name: tripcheck-deployment-${self:custom.stage} # デプロイ用S3バケット名
+    serverSideEncryption: AES256 # バケットの暗号化
 
   apiGateway:
-    shouldStartNameWithService: true  # API Gateway名にサービス名をつける
+    shouldStartNameWithService: true # API Gateway名にサービス名をつける
 
   # HTTP APIの設定
   httpApi:
@@ -42,19 +42,16 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - 'Fn::GetAtt': [PlanTable, Arn]  # DynamoDBテーブルのARN
+        - 'Fn::GetAtt': [PlanTable, Arn] # DynamoDBテーブルのARN
 
   environment:
-    TABLE_NAME: ${self:custom.tableName}  # 環境変数としてテーブル名
-
-plugins:
-  - serverless-deployment-bucket  # デプロイバケットカスタマイズ用プラグイン
+    TABLE_NAME: ${self:custom.tableName} # 環境変数としてテーブル名
 
 package:
-  individually: true  # 関数ごとに個別パッケージ
+  individually: true # 関数ごとに個別パッケージ
   patterns:
-    - '!test/**'         # テストフォルダを除外
-    - '!src/index.ts'    # 不要ファイルを除外
+    - '!test/**' # テストフォルダを除外
+    - '!src/index.ts' # 不要ファイルを除外
 
 functions:
   get-plan:

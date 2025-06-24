@@ -18,7 +18,7 @@ import { randomUUID } from 'crypto'
 
 import { GetPagedResult, IBaseRepository, UpdateModel } from '../../../core/domain/repository/base-repository.js'
 import { DynamoModel } from './dynamo-model.js'
-import { BaseEntity } from '../../../core/domain/model/base.js'
+import { BaseEntity } from '@trip-check/types'
 
 const dynamoDbWriteBatchSize = 25
 const dynamoDbGetBatchSize = 100
@@ -103,7 +103,7 @@ export abstract class BaseDynamoRepository<T extends BaseEntity> implements IBas
    * @param nextToken NextToken to use for the pagination.
    * @returns Get all the entities of type T from the table following the pagination arguments.
    */
-  public async getPaged(count?: number | undefined, nextToken?: string | undefined): Promise<GetPagedResult<T>> {
+  public async getPaged(count?: number, nextToken?: string): Promise<GetPagedResult<T>> {
     const limit = count ? count : 10
     const exclusiveStartKey = this.getExclusiveStartKey(nextToken)
 
@@ -330,9 +330,9 @@ export abstract class BaseDynamoRepository<T extends BaseEntity> implements IBas
   protected async getByGSI(
     index: number,
     gsipk: string,
-    gsisk?: string | undefined,
-    count?: number | undefined,
-    nextToken?: string | undefined,
+    gsisk?: string,
+    count?: number,
+    nextToken?: string,
   ): Promise<GetPagedResult<T>> {
     const exclusiveStartKey = this.getExclusiveStartKey(nextToken)
 

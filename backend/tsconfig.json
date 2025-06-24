@@ -3,8 +3,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ESNext"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "./",
     "outDir": ".build",
     "removeComments": true,
@@ -13,8 +13,12 @@
     "strict": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"],
+      "@trip-check/utils": ["../utils/dist"]
+    }
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "./tests/**"]
 }

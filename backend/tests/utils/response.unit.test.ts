@@ -1,4 +1,3 @@
-import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
 import {
@@ -10,6 +9,7 @@ import {
   unprocessableEntity as unprocessableContent,
 } from '../../src/utils/response.js'
 import { randomUUID } from 'node:crypto'
+import assert from 'node:assert'
 
 describe('response must be in the API Gateway format', () => {
   const contentType = 'Content-Type'

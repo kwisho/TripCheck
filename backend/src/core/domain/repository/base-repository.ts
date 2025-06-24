@@ -1,4 +1,5 @@
-import { BaseEntity } from '../model/base.js'
+import { BaseEntity } from '@trip-check/types'
+import { GetPagedResult } from '@trip-check/utils'
 
 /**
  * Abstract interface for a base repository.
@@ -23,7 +24,7 @@ export interface IBaseRepository<T extends BaseEntity> {
    * @param nextToken NextToken to use for the pagination.
    * @returns Get all the entities of type T from the table following the pagination arguments.
    */
-  getPaged(count?: number | undefined, nextToken?: string | undefined): Promise<GetPagedResult<T>>
+  getPaged(count?: number, nextToken?: string): Promise<GetPagedResult<T>>
 
   /**
    * Create a new instance of type T on the table.
@@ -69,15 +70,6 @@ export interface IBaseRepository<T extends BaseEntity> {
    * @returns the number of items deleted.
    */
   batchDelete(sks: string[]): Promise<number>
-}
-
-/**
- * This interface defines the structure of the object to be used as part of GetAllCommand on DynamoDb operations.
- */
-export interface GetPagedResult<T> {
-  items: T[]
-  nextToken?: string
-  count?: number
 }
 
 /**

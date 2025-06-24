@@ -1,22 +1,26 @@
 import { signIn } from '@/auth/signIn';
 import FormButton from '@/components/common/FormButton';
 import FormInput from '@/components/common/FormInput';
-import React, { useState } from 'react';
+import { RootStackParamList } from '@/types/navigation';
+import { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
+import { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import { Title } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const onPressLogin = async () => {
+  const onPressLogin = async (): Promise<void> => {
     if (!email || !password) {
       Alert.alert('エラー', 'メールアドレスとパスワードを入力してください');
       return;
     }
-
     try {
       await signIn(email, password);
+      navigation.navigate('(tabs)');
     } catch (error) {
       console.log(error);
     }
@@ -24,7 +28,9 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Title style={styles.title}>TripCheck ログイン</Title>
+      <Text variant="titleLarge" style={{ marginBottom: 16, textAlign: 'center' }}>
+        TripCheck ログイン
+      </Text>
       <FormInput
         label="メールアドレス"
         value={email}

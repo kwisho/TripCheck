@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextInput } from 'react-native-paper';
+import { TextInput, TextInputProps } from 'react-native-paper';
 
 type Props = {
   label: string;
@@ -7,6 +7,7 @@ type Props = {
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  returnKeyType?: TextInputProps['returnKeyType'];
 };
 
 const FormInput = ({
@@ -14,6 +15,7 @@ const FormInput = ({
   value,
   onChangeText,
   keyboardType = 'default',
+  returnKeyType,
 }: Props): React.JSX.Element => {
   return (
     <TextInput
@@ -21,6 +23,7 @@ const FormInput = ({
       value={value}
       onChangeText={onChangeText}
       keyboardType={keyboardType}
+      returnKeyType={returnKeyType}
     />
   );
 };

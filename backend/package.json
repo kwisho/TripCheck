@@ -1,11 +1,11 @@
 {
-  "name": "@felipeoriani/flight-service",
+  "name": "@trip-check/backend",
   "version": "1.0.0",
-  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "start": "yarn build && node .build/src/index.js",
-    "lint": "eslint --ext .ts . & prettier --write src",
+    "start": "npm run build && node .build/src/index.js",
+    "lint": "expo lint && prettier --write .",
     "lint:fix": "eslint --fix --ext .ts .",
     "test": "glob -c \"node --import tsx --no-warnings --test\" \"tests/**/*.{spec,test}.ts\"",
     "type-check": "tsc --pretty --noEmit",
@@ -13,32 +13,8 @@
     "deploy": "serverless deploy --verbose",
     "destroy": "serverless remove --verbose"
   },
-  "keywords": [
-    "node",
-    "nodejs",
-    "javascript",
-    "typescript",
-    "serverless",
-    "api"
-  ],
-  "author": "felipeoriani",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/aws-lambda": "^8.10.133",
-    "@types/node": "*",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
-    "@typescript-eslint/parser": "^6.20.0",
-    "eslint": "^8.56.0",
-    "glob": "^10.3.1",
-    "prettier": "^3.5.3",
-    "serverless-deployment-bucket": "^1.6.0",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
-  },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.504.0",
-    "@aws-sdk/client-sqs": "^3.536.0",
-    "@aws-sdk/lib-dynamodb": "^3.504.0",
-    "joi": "^17.12.1"
+    "@trip-check/types": "1.0.0",
+    "@trip-check/utils": "1.0.0"
   }
 }

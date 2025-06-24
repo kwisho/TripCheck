@@ -1,4 +1,4 @@
-import { BaseEntity } from '../../domain/model/base.js'
+import { BaseEntity } from '@trip-check/types'
 
 /**
  * Base model for all entities.
