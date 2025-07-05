@@ -20,7 +20,7 @@
     "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend",
     "lint:fix": "npm run lint:fix --workspace=backend",
     "build": "npm run build --workspace=backend",
-    "deploy": "npm run deploy --workspace=backend",
+    "deploy": "node -r dotenv/config ./node_modules/.bin/serverless deploy --verbose",
     "destroy": "npm run destroy --workspace=backend",
     "type-check": "npm run type-check --workspace=backend"
   },
@@ -70,9 +70,11 @@
     "react-native-get-random-values": "^1.11.0",
     "react-native-maps": "1.20.1",
     "react-native-paper": "^5.14.5",
+    "react-native-paper-dates": "^0.22.46",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
+    "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "typescript-eslint": "^8.33.1"

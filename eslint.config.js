@@ -1,7 +1,7 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
 import js from '@eslint/js';
+import path from 'path';
 import tseslint from 'typescript-eslint';
+import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,6 +13,7 @@ export default [
     ignores: ['node_modules', 'dist', 'build', '.expo'],
     languageOptions: {
         parser: tseslint.parser,
+        // tsconfigRootDir: __dirname,
         parserOptions: {
             project: [
                 path.join(__dirname, 'frontend/tsconfig.json'),

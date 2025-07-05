@@ -16,9 +16,11 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./*"],
-      "@trip-check/utils": ["../utils/dist"]
+      "@trip-check/utils": ["../utils/dist"],
+      "@trip-check/type": ["../type/dist"],
+      "@fixtures/*": ["tests/fixtures/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "./tests/**"]
+  "include": ["./src/**/*.ts", "./tests/**/*.ts"],
+  "exclude": ["node_modules"]
 }

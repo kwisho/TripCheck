@@ -1,46 +1,73 @@
-import { Plan } from '@trip-check/types';
-import { API_ENDPOINTS } from '../common/endpoints';
-import { GetPagedResult } from '@trip-check/utils';
 import { useApiFetch } from '@/hooks/useApiFetch';
+import { FullPlan, Plan } from '@trip-check/types';
+import { GetPagedResult } from '@trip-check/utils';
+import { useCallback } from 'react';
+import { API_ENDPOINTS } from '../common/endpoints';
 
 export function usePlanApi() {
   const apiFetch = useApiFetch();
-  const dateProps = ['startDate', 'endDate'];
+  const dateProps = [
+    'startDate',
+    'endDate',
+    'locationStartDate',
+    'locationEndDate',
+    'arrivalTime',
+    'departureTime',
+    'createdAt',
+    'updatedAt',
+  ];
 
-  const getPlans = (): Promise<GetPagedResult<Plan>> =>
-    apiFetch<void, GetPagedResult<Plan>>(
+  const getPlans = useCallback((): Promise<GetPagedResult<Plan>> => {
+    return apiFetch<void, GetPagedResult<Plan>>(
       API_ENDPOINTS.plans.getAll(),
       'GET',
       undefined,
       dateProps
     ) as Promise<GetPagedResult<Plan>>;
+  }, [apiFetch]);
 
-  const getPlan = (id: string): Promise<Plan> =>
-    apiFetch<void, Plan>(
-      API_ENDPOINTS.plans.getById(id),
-      'GET',
-      undefined,
-      dateProps
-    ) as Promise<Plan>;
+  const getPlan = useCallback(
+    (id: string): Promise<FullPlan> => {
+      return apiFetch<void, FullPlan>(
+        API_ENDPOINTS.plans.getById(id),
+        'GET',
+        undefined,
+        dateProps
+      ) as Promise<FullPlan>;
+    },
+    [apiFetch]
+  );
 
-  const createPlan = (plan: Partial<Plan>): Promise<Plan> =>
-    apiFetch<Partial<Plan>, Plan>(
-      API_ENDPOINTS.plans.create(),
-      'POST',
-      plan,
-      dateProps
-    ) as Promise<Plan>;
+  const createPlan = useCallback(
+    (plan: Partial<Plan>): Promise<Plan> => {
+      return apiFetch<Partial<Plan>, Plan>(
+        API_ENDPOINTS.plans.create(),
+        'POST',
+        plan,
+        dateProps
+      ) as Promise<Plan>;
+    },
+    [apiFetch]
+  );
 
-  const updatePlan = (id: string, plan: Partial<Plan>): Promise<Plan> =>
-    apiFetch<Partial<Plan>, Plan>(
-      API_ENDPOINTS.plans.update(id),
-      'POST',
-      plan,
-      dateProps
-    ) as Promise<Plan>;
+  const updatePlan = useCallback(
+    (id: string, plan: Partial<Plan>): Promise<Plan> => {
+      return apiFetch<Partial<Plan>, Plan>(
+        API_ENDPOINTS.plans.update(id),
+        'POST',
+        plan,
+        dateProps
+      ) as Promise<Plan>;
+    },
+    [apiFetch]
+  );
 
-  const deletePlan = (id: string): Promise<void> =>
-    apiFetch<void, void>(API_ENDPOINTS.plans.delete(id), 'DELETE') as Promise<void>;
+  const deletePlan = useCallback(
+    (id: string): Promise<void> => {
+      return apiFetch<void, void>(API_ENDPOINTS.plans.delete(id), 'DELETE') as Promise<void>;
+    },
+    [apiFetch]
+  );
 
   return {
     getPlans,

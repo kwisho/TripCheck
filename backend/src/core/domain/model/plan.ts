@@ -6,6 +6,7 @@ export interface IPlanRepository extends IBaseRepository<Plan> {
     userId: string,
     startDate?: Date,
     endDate?: Date,
+    advisability?: boolean,
     count?: number,
     nextToken?: string,
   ): Promise<GetPagedResult<Plan>>
@@ -15,6 +16,7 @@ export interface IPlanService {
     userId: string,
     startDate: Date,
     endDate: Date,
+    advisability: boolean | null,
     count: number,
     nextToken: string | undefined,
   ): Promise<ValidateableResponse<GetPagedResult<Plan>>>

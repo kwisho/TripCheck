@@ -1,11 +1,12 @@
 import joi from 'joi'
 import { BaseEntity } from './base'
+import { Location } from './location'
 
-export type TransportType = 'car' | 'train' | 'walk' | 'taxi'| 'bike'
+export type TransportType = 'DRIVING' | 'WALKING' | 'BICYCLING' | 'TRANSIT';
 
 export type RouteSegment = BaseEntity & {
   /** 対象の旅程プランID */
-  planId: string
+  planItemId: string
   /** 出発地の場所ID */
   fromLocationId: string
   /** 到着地の場所ID */
@@ -20,11 +21,14 @@ export type RouteSegment = BaseEntity & {
   departureTime?: Date
   /** 到着予定時刻（任意、計算結果として利用） */
   arrivalTime?: Date
+  /** リレーション先 */
+  fromLocation?: Location;
+  toLocation?: Location;
 }
 
 export const RouteSegmentValidator = joi.object<RouteSegment>().keys({
   id: joi.string().optional(),
-  planId: joi.string().required(),
+  planItemId: joi.string().required(),
   fromLocationId: joi.string().required(),
   toLocationId: joi.string().required(),
   transportType: joi.string().valid('car', 'train', 'walk', 'taxi', 'bike').required(),

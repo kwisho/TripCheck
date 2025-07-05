@@ -1,13 +1,13 @@
 import { Plan, PlanValidator } from '@trip-check/types'
-import { ValidateableResponse } from '@trip-check/utils'
+import { GetPagedResult, ValidateableResponse } from '@trip-check/utils'
 import { IPlanRepository, IPlanService } from '../domain/model/plan.js'
-import { GetPagedResult } from '../domain/repository/base-repository.js'
 import { PlanRepository } from '../infrastructure/repositories/plan-repository.js'
 
 export class PlanService implements IPlanService {
   constructor(private readonly planRepository: IPlanRepository = new PlanRepository()) {}
 
   public async get(id: string): Promise<ValidateableResponse<Plan>> {
+    console.log('PlanService.get called with id')
     const model = await this.planRepository.get(id)
     if (!model) {
       return {
@@ -51,6 +51,7 @@ export class PlanService implements IPlanService {
     userId: string,
     startDate?: Date,
     endDate?: Date,
+    advisability?: boolean | null,
     count?: number,
     nextToken?: string,
   ): Promise<ValidateableResponse<GetPagedResult<Plan>>> {
@@ -58,6 +59,7 @@ export class PlanService implements IPlanService {
     console.log(userId)
     console.log(startDate)
     console.log(endDate)
+    console.log(advisability)
     console.log(count)
     console.log(nextToken)
 
@@ -70,7 +72,8 @@ export class PlanService implements IPlanService {
         endDate: new Date('2025-05-05'),
         description: '札幌から函館までの絶景ドライブ',
         userId: 'user123',
-        icon: '🚗',
+        advisability: true,
+        imageUrl: 'https://picsum.photos/200/300',
       },
       {
         id: '2',
@@ -79,7 +82,8 @@ export class PlanService implements IPlanService {
         endDate: new Date('2024-05-03'),
         description: '東京で行われる市民マラソンに参加',
         userId: 'user123',
-        icon: '🏃',
+        advisability: false,
+        imageUrl: 'https://picsum.photos/200/300',
       },
       {
         id: '3',
@@ -88,7 +92,8 @@ export class PlanService implements IPlanService {
         endDate: new Date('2024-04-11'),
         description: '富士山周辺をゆったりハイキング',
         userId: 'user123',
-        icon: '⛰️',
+        advisability: true,
+        imageUrl: 'https://picsum.photos/200/300',
       },
     ]
 

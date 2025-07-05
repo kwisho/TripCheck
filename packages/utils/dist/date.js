@@ -7,6 +7,7 @@ exports.formatDate = formatDate;
 exports.isDate = isDate;
 exports.formatJapaneseDate = formatJapaneseDate;
 exports.formatResponseBodyRecursive = formatResponseBodyRecursive;
+exports.formatTime = formatTime;
 const request_1 = require("./request");
 /**
  * Get unix time format number from a date.
@@ -109,4 +110,12 @@ function formatResponseBodyRecursive(body, dataProps) {
     const allDateProps = [...request_1.generalDateProperties, ...(dataProps || [])];
     convertDates(result, allDateProps);
     return result;
+}
+/**
+ * Format a date object to time string like "13:30".
+ * @param date Date to format.
+ * @returns Time string in HH:mm format.
+ */
+function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }

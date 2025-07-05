@@ -10,7 +10,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     console.log('Body:', event.body)
     const claims = event.requestContext?.authorizer?.jwt?.claims
 
-    // Cognitoのsub（ユーザーID）を使うのが一般的
     const userId = claims?.sub as string
     if (!userId) {
       return badRequest('not found userId')
@@ -27,7 +26,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const endDate = new Date()
 
     const planService: IPlanService = new PlanService()
-    const result = await planService.getPaged(userId, startDate, endDate, 10, '')
+    const result = await planService.getPaged(userId, startDate, endDate, null, 10, '')
 
     return ok(result.model)
   } catch (error) {

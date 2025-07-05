@@ -10,7 +10,7 @@ custom:
 provider:
   name: aws # プロバイダはAWS
   runtime: nodejs22.x # Lambdaランタイム
-  region: ${self:custom.region} # リージョン設定
+  region: ap-northeast-1 # リージョン設定
   stage: ${self:custom.stage} # ステージ設定
   memorySize: 256 # Lambdaのメモリ
   deploymentBucket:
@@ -23,13 +23,6 @@ provider:
   # HTTP APIの設定
   httpApi:
     cors: true
-    authorizers:
-      TripCheckJwtAuthorizer:
-        type: jwt
-        identitySource: $request.header.Authorization
-        audience:
-          - 74mtj0sj8kpi7bckr84o2fskie
-        issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
   iamRoleStatements:
     - Effect: Allow
@@ -45,7 +38,8 @@ provider:
         - 'Fn::GetAtt': [PlanTable, Arn] # DynamoDBテーブルのARN
 
   environment:
-    TABLE_NAME: ${self:custom.tableName} # 環境変数としてテーブル名
+    TABLE_NAME: ${self:custom.tableName}
+    GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}
 
 package:
   individually: true # 関数ごとに個別パッケージ
@@ -54,37 +48,97 @@ package:
     - '!src/index.ts' # 不要ファイルを除外
 
 functions:
+  # Plan
   get-plan:
     handler: src/functions/get-plan.handler
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /v1/plans
           method: get
-          authorizer: TripCheckJwtAuthorizer
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
   get-plan-by-id:
     handler: src/functions/get-plan-by-id.handler
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /v1/plans/{id}
           method: get
-          authorizer: TripCheckJwtAuthorizer
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
   create-plan:
     handler: src/functions/create-plan.handler
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /v1/plans
           method: post
-          authorizer: TripCheckJwtAuthorizer
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
+
+  update-plan:
+    handler: src/functions/create-plan.handler
+    reservedConcurrency: 5
+    events:
+      - httpApi:
+          path: /v1/plans/{id}
+          method: post
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
   delete-plan:
     handler: src/functions/delete-plan.handler
+    reservedConcurrency: 5
     events:
       - httpApi:
           path: /v1/plans/{id}
           method: delete
-          authorizer: TripCheckJwtAuthorizer
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
+
+  # Map
+  get-map:
+    handler: src/functions/get-map.handler
+    reservedConcurrency: 5
+    events:
+      - httpApi:
+          path: /v1/maps
+          method: get
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
 resources:
   Resources:

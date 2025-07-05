@@ -14,5 +14,9 @@
   "dependencies": {
     "@trip-check/types": "1.0.0",
     "@trip-check/utils": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/react-native-vector-icons": "^6.4.18",
+    "@types/react-native-web": "^0.19.1"
   }
 }

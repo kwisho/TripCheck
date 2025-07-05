@@ -1,9 +1,8 @@
 import { confirmSignUp } from '@/auth/confirmSignUp';
-import FormButton from '@/components/common/FormButton';
-import FormInput from '@/components/common/FormInput';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
+import { Button, TextInput } from 'react-native-paper';
 
 export default function ConfirmCodeScreen() {
   const [code, setCode] = useState('');
@@ -23,8 +22,10 @@ export default function ConfirmCodeScreen() {
 
   return (
     <View style={styles.container}>
-      <FormInput label="確認コード" value={code} onChangeText={setCode} keyboardType="numeric" />
-      <FormButton title="確認" onPress={onPressConfirm} disabled={!email || !code} />
+      <TextInput label="確認コード" value={code} onChangeText={setCode} keyboardType="numeric" />
+      <Button onPress={onPressConfirm} disabled={!email || !code}>
+        確認
+      </Button>
     </View>
   );
 }

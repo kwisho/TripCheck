@@ -1,5 +1,3 @@
-import { Tabs, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
@@ -7,29 +5,13 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { getCurrentUser } from '@/auth/auth';
+import { Tabs } from 'expo-router';
+
+// ✅ 正しいアイコンセットを指定してインポート
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
-  const [isChecking, setIsChecking] = useState<boolean>(true);
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await getCurrentUser();
-        console.log('user from checkAuth', user);
-        if (!user) {
-          router.replace('/login');
-        }
-      } catch (error) {
-        console.error('checkAuth error:', error);
-        alert(error);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-    checkAuth();
-  }, []);
 
   return (
     <Tabs
@@ -40,7 +22,6 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
           },
           default: {},
@@ -55,10 +36,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="account"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'アカウント',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="account" size={28} color={color} />
+          ),
         }}
       />
     </Tabs>

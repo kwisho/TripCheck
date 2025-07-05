@@ -16,9 +16,10 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 import { randomUUID } from 'crypto'
 
-import { GetPagedResult, IBaseRepository, UpdateModel } from '../../../core/domain/repository/base-repository.js'
+import { IBaseRepository, UpdateModel } from '../../../core/domain/repository/base-repository.js'
 import { DynamoModel } from './dynamo-model.js'
 import { BaseEntity } from '@trip-check/types'
+import { GetPagedResult } from '@trip-check/utils'
 
 const dynamoDbWriteBatchSize = 25
 const dynamoDbGetBatchSize = 100

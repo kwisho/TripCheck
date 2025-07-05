@@ -110,3 +110,11 @@ export function formatResponseBodyRecursive<T>(body: string, dataProps?: string[
   convertDates(result, allDateProps);
   return result as T;
 }
+/**
+ * Format a date object to time string like "13:30".
+ * @param date Date to format.
+ * @returns Time string in HH:mm format.
+ */
+export function formatTime(date: Date): string {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}

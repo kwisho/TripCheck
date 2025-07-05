@@ -41,3 +41,9 @@ export declare function formatJapaneseDate(date: Date): string;
  * @returns The parsed object with specified properties converted to Date instances.
  */
 export declare function formatResponseBodyRecursive<T>(body: string, dataProps?: string[]): T;
+/**
+ * Format a date object to time string like "13:30".
+ * @param date Date to format.
+ * @returns Time string in HH:mm format.
+ */
+export declare function formatTime(date: Date): string;

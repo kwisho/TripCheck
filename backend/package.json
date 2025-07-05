@@ -16,5 +16,9 @@
   "dependencies": {
     "@trip-check/types": "1.0.0",
     "@trip-check/utils": "1.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^4.17.1",
+    "serverless-dotenv-plugin": "^6.0.0"
   }
 }

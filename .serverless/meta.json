@@ -1,0 +1,3387 @@
+{
+  "/Users/kawai_shota/Project/TripCheck/serverless.yml": {
+    "versionFramework": "4.17.1",
+    "servicePath": "/Users/kawai_shota/Project/TripCheck/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "tripcheck-service",
+      "frameworkVersion": "4",
+      "custom": {
+        "stage": "dev",
+        "region": "ap-northeast-1",
+        "tableName": "tripcheck-service-plans-dev"
+      },
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs22.x",
+        "region": "ap-northeast-1",
+        "stage": "dev",
+        "memorySize": 256,
+        "deploymentBucket": "tripcheck-deployment-dev",
+        "apiGateway": {
+          "shouldStartNameWithService": true
+        },
+        "httpApi": {
+          "cors": true
+        },
+        "iamRoleStatements": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:DescribeTable",
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem"
+            ],
+            "Resource": [
+              {
+                "Fn::GetAtt": [
+                  "PlanTable",
+                  "Arn"
+                ]
+              }
+            ]
+          }
+        ],
+        "environment": {
+          "TABLE_NAME": "tripcheck-service-plans-dev",
+          "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+        },
+        "versionFunctions": true,
+        "deploymentBucketObject": {
+          "name": "tripcheck-deployment-dev",
+          "serverSideEncryption": "AES256"
+        },
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "GetDashplanLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan"
+              }
+            },
+            "GetDashplanDashbyDashidLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan-by-id"
+              }
+            },
+            "CreateDashplanLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-create-plan"
+              }
+            },
+            "UpdateDashplanLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-update-plan"
+              }
+            },
+            "DeleteDashplanLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-delete-plan"
+              }
+            },
+            "GetDashmapLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-map"
+              }
+            },
+            "IamRoleLambdaExecution": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                "AssumeRolePolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": [
+                          "lambda.amazonaws.com"
+                        ]
+                      },
+                      "Action": [
+                        "sts:AssumeRole"
+                      ]
+                    }
+                  ]
+                },
+                "Policies": [
+                  {
+                    "PolicyName": {
+                      "Fn::Join": [
+                        "-",
+                        [
+                          "tripcheck-service",
+                          "dev",
+                          "lambda"
+                        ]
+                      ]
+                    },
+                    "PolicyDocument": {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "logs:TagResource"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:PutLogEvents"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "dynamodb:DescribeTable",
+                            "dynamodb:Query",
+                            "dynamodb:Scan",
+                            "dynamodb:GetItem",
+                            "dynamodb:PutItem",
+                            "dynamodb:UpdateItem",
+                            "dynamodb:DeleteItem"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::GetAtt": [
+                                "PlanTable",
+                                "Arn"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "Path": "/",
+                "RoleName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "tripcheck-service",
+                      "dev",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "lambdaRole"
+                    ]
+                  ]
+                }
+              }
+            },
+            "GetDashplanLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan.zip"
+                },
+                "Handler": "src/functions/get-plan.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-get-plan",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "GetDashplanLogGroup"
+              ]
+            },
+            "GetDashplanDashbyDashidLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan-by-id.zip"
+                },
+                "Handler": "src/functions/get-plan-by-id.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-get-plan-by-id",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "GetDashplanDashbyDashidLogGroup"
+              ]
+            },
+            "CreateDashplanLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/create-plan.zip"
+                },
+                "Handler": "src/functions/create-plan.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-create-plan",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "CreateDashplanLogGroup"
+              ]
+            },
+            "UpdateDashplanLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/update-plan.zip"
+                },
+                "Handler": "src/functions/create-plan.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-update-plan",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "UpdateDashplanLogGroup"
+              ]
+            },
+            "DeleteDashplanLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/delete-plan.zip"
+                },
+                "Handler": "src/functions/delete-plan.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-delete-plan",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "DeleteDashplanLogGroup"
+              ]
+            },
+            "GetDashmapLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "tripcheck-deployment-dev",
+                  "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-map.zip"
+                },
+                "Handler": "src/functions/get-map.handler",
+                "Runtime": "nodejs22.x",
+                "FunctionName": "tripcheck-service-dev-get-map",
+                "MemorySize": 256,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "TABLE_NAME": "tripcheck-service-plans-dev",
+                    "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                },
+                "ReservedConcurrentExecutions": 5
+              },
+              "DependsOn": [
+                "GetDashmapLogGroup"
+              ]
+            },
+            "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "GetDashplanLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "GetDashplanDashbyDashidLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "CreateDashplanLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "UpdateDashplanLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "DeleteDashplanLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "GetDashmapLambdaFunction"
+                },
+                "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+              }
+            },
+            "HttpApi": {
+              "Type": "AWS::ApiGatewayV2::Api",
+              "Properties": {
+                "Name": "dev-tripcheck-service",
+                "ProtocolType": "HTTP",
+                "CorsConfiguration": {
+                  "AllowCredentials": "<REDACTED>",
+                  "AllowHeaders": [
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                    "X-Amzn-Trace-Id"
+                  ],
+                  "AllowMethods": [
+                    "OPTIONS",
+                    "GET",
+                    "POST",
+                    "DELETE"
+                  ],
+                  "AllowOrigins": [
+                    "*"
+                  ]
+                }
+              }
+            },
+            "HttpApiStage": {
+              "Type": "AWS::ApiGatewayV2::Stage",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "StageName": "$default",
+                "AutoDeploy": true,
+                "DefaultRouteSettings": {
+                  "DetailedMetricsEnabled": false
+                }
+              }
+            },
+            "GetDashplanLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "GetDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationGetDashplan": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "GetDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetV1Plans": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /v1/plans",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationGetDashplan"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationGetDashplan"
+            },
+            "GetDashplanDashbyDashidLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "GetDashplanDashbyDashidLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationGetDashplanDashbyDashid": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "GetDashplanDashbyDashidLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetV1PlansIdVar": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /v1/plans/{id}",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationGetDashplanDashbyDashid"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationGetDashplanDashbyDashid"
+            },
+            "CreateDashplanLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "CreateDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationCreateDashplan": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "CreateDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRoutePostV1Plans": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "POST /v1/plans",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationCreateDashplan"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationCreateDashplan"
+            },
+            "UpdateDashplanLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "UpdateDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationUpdateDashplan": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "UpdateDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRoutePostV1PlansIdVar": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "POST /v1/plans/{id}",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationUpdateDashplan"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationUpdateDashplan"
+            },
+            "DeleteDashplanLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "DeleteDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationDeleteDashplan": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "DeleteDashplanLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteDeleteV1PlansIdVar": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "DELETE /v1/plans/{id}",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationDeleteDashplan"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationDeleteDashplan"
+            },
+            "GetDashmapLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "GetDashmapLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationGetDashmap": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "GetDashmapLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetV1Maps": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /v1/maps",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationGetDashmap"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationGetDashmap"
+            },
+            "PlanTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "tripcheck-service-plans-dev",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "id",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "id",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "BillingMode": "PAY_PER_REQUEST"
+              }
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "tripcheck-deployment-dev",
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "GetDashplanLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-GetDashplanLambdaFunctionQualifiedArn"
+              }
+            },
+            "GetDashplanDashbyDashidLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-GetDashplanDashbyDashidLambdaFunctionQualifiedArn"
+              }
+            },
+            "CreateDashplanLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-CreateDashplanLambdaFunctionQualifiedArn"
+              }
+            },
+            "UpdateDashplanLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-UpdateDashplanLambdaFunctionQualifiedArn"
+              }
+            },
+            "DeleteDashplanLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-DeleteDashplanLambdaFunctionQualifiedArn"
+              }
+            },
+            "GetDashmapLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-GetDashmapLambdaFunctionQualifiedArn"
+              }
+            },
+            "HttpApiId": {
+              "Description": "Id of the HTTP API",
+              "Value": {
+                "Ref": "HttpApi"
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-HttpApiId"
+              }
+            },
+            "HttpApiUrl": {
+              "Description": "URL of the HTTP API",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-tripcheck-service-dev-HttpApiUrl"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "package": {
+        "individually": true,
+        "patterns": [
+          "!tests/**",
+          "!src/**/*.test.ts",
+          "!src/index.ts",
+          "!**/*.map",
+          "!**/*.md",
+          "!node_modules/**/*",
+          "!frontend/**",
+          "!packages/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/tripcheck-service/dev/code-artifacts",
+        "deploymentBucket": "tripcheck-deployment-dev",
+        "artifactDirectoryName": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z"
+      },
+      "functions": {
+        "get-plan": {
+          "handler": "src/functions/get-plan.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/plans",
+                "method": "get",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/v1/plans"
+            }
+          ],
+          "name": "tripcheck-service-dev-get-plan",
+          "package": {
+            "artifact": ".serverless/get-plan.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg"
+        },
+        "get-plan-by-id": {
+          "handler": "src/functions/get-plan-by-id.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/plans/{id}",
+                "method": "get",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/v1/plans/{id}"
+            }
+          ],
+          "name": "tripcheck-service-dev-get-plan-by-id",
+          "package": {
+            "artifact": ".serverless/get-plan-by-id.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM"
+        },
+        "create-plan": {
+          "handler": "src/functions/create-plan.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/plans",
+                "method": "post",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "POST",
+              "resolvedPath": "/v1/plans"
+            }
+          ],
+          "name": "tripcheck-service-dev-create-plan",
+          "package": {
+            "artifact": ".serverless/create-plan.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc"
+        },
+        "update-plan": {
+          "handler": "src/functions/create-plan.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/plans/{id}",
+                "method": "post",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "POST",
+              "resolvedPath": "/v1/plans/{id}"
+            }
+          ],
+          "name": "tripcheck-service-dev-update-plan",
+          "package": {
+            "artifact": ".serverless/update-plan.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw"
+        },
+        "delete-plan": {
+          "handler": "src/functions/delete-plan.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/plans/{id}",
+                "method": "delete",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "DELETE",
+              "resolvedPath": "/v1/plans/{id}"
+            }
+          ],
+          "name": "tripcheck-service-dev-delete-plan",
+          "package": {
+            "artifact": ".serverless/delete-plan.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q"
+        },
+        "get-map": {
+          "handler": "src/functions/get-map.handler",
+          "reservedConcurrency": 5,
+          "events": [
+            {
+              "httpApi": {
+                "path": "/v1/maps",
+                "method": "get",
+                "authorizers": {
+                  "TripCheckJwtAuthorizer": {
+                    "type": "jwt",
+                    "identitySource": "$request.header.Authorization",
+                    "audience": [
+                      "74mtj0sj8kpi7bckr84o2fskie"
+                    ],
+                    "issuerUrl": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd"
+                  }
+                }
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/v1/maps"
+            }
+          ],
+          "name": "tripcheck-service-dev-get-map",
+          "package": {
+            "artifact": ".serverless/get-map.zip"
+          },
+          "memory": 256,
+          "timeout": 6,
+          "runtime": "nodejs22.x",
+          "vpc": {},
+          "versionLogicalId": "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM"
+        }
+      },
+      "resources": {
+        "Resources": {
+          "PlanTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "tripcheck-service-plans-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        },
+        "Outputs": {}
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs22.x",
+      "region": "ap-northeast-1",
+      "stage": "dev",
+      "memorySize": 256,
+      "deploymentBucket": "tripcheck-deployment-dev",
+      "apiGateway": {
+        "shouldStartNameWithService": true
+      },
+      "httpApi": {
+        "cors": true
+      },
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:DescribeTable",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem"
+          ],
+          "Resource": [
+            {
+              "Fn::GetAtt": [
+                "PlanTable",
+                "Arn"
+              ]
+            }
+          ]
+        }
+      ],
+      "environment": {
+        "TABLE_NAME": "tripcheck-service-plans-dev",
+        "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+      },
+      "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "tripcheck-deployment-dev",
+        "serverSideEncryption": "AES256"
+      },
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "GetDashplanLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan"
+            }
+          },
+          "GetDashplanDashbyDashidLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan-by-id"
+            }
+          },
+          "CreateDashplanLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-create-plan"
+            }
+          },
+          "UpdateDashplanLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-update-plan"
+            }
+          },
+          "DeleteDashplanLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-delete-plan"
+            }
+          },
+          "GetDashmapLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-map"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "tripcheck-service",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "dynamodb:DescribeTable",
+                          "dynamodb:Query",
+                          "dynamodb:Scan",
+                          "dynamodb:GetItem",
+                          "dynamodb:PutItem",
+                          "dynamodb:UpdateItem",
+                          "dynamodb:DeleteItem"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "PlanTable",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "tripcheck-service",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "GetDashplanLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan.zip"
+              },
+              "Handler": "src/functions/get-plan.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-get-plan",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "GetDashplanLogGroup"
+            ]
+          },
+          "GetDashplanDashbyDashidLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan-by-id.zip"
+              },
+              "Handler": "src/functions/get-plan-by-id.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-get-plan-by-id",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "GetDashplanDashbyDashidLogGroup"
+            ]
+          },
+          "CreateDashplanLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/create-plan.zip"
+              },
+              "Handler": "src/functions/create-plan.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-create-plan",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "CreateDashplanLogGroup"
+            ]
+          },
+          "UpdateDashplanLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/update-plan.zip"
+              },
+              "Handler": "src/functions/create-plan.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-update-plan",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "UpdateDashplanLogGroup"
+            ]
+          },
+          "DeleteDashplanLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/delete-plan.zip"
+              },
+              "Handler": "src/functions/delete-plan.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-delete-plan",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "DeleteDashplanLogGroup"
+            ]
+          },
+          "GetDashmapLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "tripcheck-deployment-dev",
+                "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-map.zip"
+              },
+              "Handler": "src/functions/get-map.handler",
+              "Runtime": "nodejs22.x",
+              "FunctionName": "tripcheck-service-dev-get-map",
+              "MemorySize": 256,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "tripcheck-service-plans-dev",
+                  "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "ReservedConcurrentExecutions": 5
+            },
+            "DependsOn": [
+              "GetDashmapLogGroup"
+            ]
+          },
+          "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetDashplanLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetDashplanDashbyDashidLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CreateDashplanLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "UpdateDashplanLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "DeleteDashplanLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetDashmapLambdaFunction"
+              },
+              "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+            }
+          },
+          "HttpApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-tripcheck-service",
+              "ProtocolType": "HTTP",
+              "CorsConfiguration": {
+                "AllowCredentials": "<REDACTED>",
+                "AllowHeaders": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent",
+                  "X-Amzn-Trace-Id"
+                ],
+                "AllowMethods": [
+                  "OPTIONS",
+                  "GET",
+                  "POST",
+                  "DELETE"
+                ],
+                "AllowOrigins": [
+                  "*"
+                ]
+              }
+            }
+          },
+          "HttpApiStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "StageName": "$default",
+              "AutoDeploy": true,
+              "DefaultRouteSettings": {
+                "DetailedMetricsEnabled": false
+              }
+            }
+          },
+          "GetDashplanLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetDashplan": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "GetDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetV1Plans": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /v1/plans",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetDashplan"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetDashplan"
+          },
+          "GetDashplanDashbyDashidLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetDashplanDashbyDashidLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetDashplanDashbyDashid": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "GetDashplanDashbyDashidLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetV1PlansIdVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /v1/plans/{id}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetDashplanDashbyDashid"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetDashplanDashbyDashid"
+          },
+          "CreateDashplanLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CreateDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationCreateDashplan": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "CreateDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostV1Plans": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /v1/plans",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationCreateDashplan"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationCreateDashplan"
+          },
+          "UpdateDashplanLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "UpdateDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationUpdateDashplan": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "UpdateDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostV1PlansIdVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /v1/plans/{id}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationUpdateDashplan"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationUpdateDashplan"
+          },
+          "DeleteDashplanLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "DeleteDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationDeleteDashplan": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "DeleteDashplanLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteDeleteV1PlansIdVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "DELETE /v1/plans/{id}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationDeleteDashplan"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationDeleteDashplan"
+          },
+          "GetDashmapLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetDashmapLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetDashmap": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "GetDashmapLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetV1Maps": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /v1/maps",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetDashmap"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetDashmap"
+          },
+          "PlanTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "tripcheck-service-plans-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "tripcheck-deployment-dev",
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "GetDashplanLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-GetDashplanLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetDashplanDashbyDashidLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-GetDashplanDashbyDashidLambdaFunctionQualifiedArn"
+            }
+          },
+          "CreateDashplanLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-CreateDashplanLambdaFunctionQualifiedArn"
+            }
+          },
+          "UpdateDashplanLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-UpdateDashplanLambdaFunctionQualifiedArn"
+            }
+          },
+          "DeleteDashplanLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-DeleteDashplanLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetDashmapLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-GetDashmapLambdaFunctionQualifiedArn"
+            }
+          },
+          "HttpApiId": {
+            "Description": "Id of the HTTP API",
+            "Value": {
+              "Ref": "HttpApi"
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-HttpApiId"
+            }
+          },
+          "HttpApiUrl": {
+            "Description": "URL of the HTTP API",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  }
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-tripcheck-service-dev-HttpApiUrl"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "service: tripcheck-service # サービス名\n\nframeworkVersion: '4' # Serverless Framework バージョン指定\n\ncustom:\n  stage: ${opt:stage, 'dev'} # デフォルトステージはdev\n  region: ap-northeast-1 # 東京リージョン\n  tableName: ${self:service}-plans-${self:custom.stage} # DynamoDB テーブル名\n\nprovider:\n  name: aws # プロバイダはAWS\n  runtime: nodejs22.x # Lambdaランタイム\n  region: ap-northeast-1 # リージョン設定\n  stage: ${self:custom.stage} # ステージ設定\n  memorySize: 256 # Lambdaのメモリ\n  deploymentBucket:\n    name: tripcheck-deployment-${self:custom.stage} # デプロイ用S3バケット名\n    serverSideEncryption: AES256 # バケットの暗号化\n\n  apiGateway:\n    shouldStartNameWithService: true # API Gateway名にサービス名をつける\n\n  # HTTP APIの設定\n  httpApi:\n    cors: true\n\n  iamRoleStatements:\n    - Effect: Allow\n      Action:\n        - dynamodb:DescribeTable\n        - dynamodb:Query\n        - dynamodb:Scan\n        - dynamodb:GetItem\n        - dynamodb:PutItem\n        - dynamodb:UpdateItem\n        - dynamodb:DeleteItem\n      Resource:\n        - 'Fn::GetAtt': [PlanTable, Arn] # DynamoDBテーブルのARN\n\n  environment:\n    TABLE_NAME: ${self:custom.tableName}\n    GOOGLE_MAPS_API_KEY: ${env:GOOGLE_MAPS_API_KEY}\n\npackage:\n  individually: true # 関数ごとに個別パッケージ\n  patterns:\n    - '!tests/**'             # テストフォルダを除外（複数形に注意）\n    - '!src/**/*.test.ts'     # テストコードを除外\n    - '!src/index.ts'         # ルートエントリが不要なら除外\n    - '!**/*.map'             # ソースマップ除外\n    - '!**/*.md'              # READMEなどのドキュメント除外\n    - '!node_modules/**/*' # AWS SDKはLambdaに標準搭載されているので除外\n    - '!frontend/**'          # フロントエンド関連ファイルを除外\n    - '!packages/**'          # 共通ライブラリなどもLambdaには不要なら除外\n\n\nfunctions:\n  # Plan\n  get-plan:\n    handler: src/functions/get-plan.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/plans\n          method: get\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\n  get-plan-by-id:\n    handler: src/functions/get-plan-by-id.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/plans/{id}\n          method: get\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\n  create-plan:\n    handler: src/functions/create-plan.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/plans\n          method: post\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\n  update-plan:\n    handler: src/functions/create-plan.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/plans/{id}\n          method: post\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\n  delete-plan:\n    handler: src/functions/delete-plan.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/plans/{id}\n          method: delete\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\n  # Map\n  get-map:\n    handler: src/functions/get-map.handler\n    reservedConcurrency: 5\n    events:\n      - httpApi:\n          path: /v1/maps\n          method: get\n          authorizers:\n            TripCheckJwtAuthorizer:\n              type: jwt\n              identitySource: $request.header.Authorization\n              audience:\n                - 74mtj0sj8kpi7bckr84o2fskie\n              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd\n\nresources:\n  Resources:\n    PlanTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:custom.tableName}\n        AttributeDefinitions:\n          - AttributeName: id\n            AttributeType: S\n        KeySchema:\n          - AttributeName: id\n            KeyType: HASH\n        BillingMode: PAY_PER_REQUEST\n",
+    "command": [
+      "deploy"
+    ],
+    "options": {
+      "config": "backend/serverless.yml",
+      "verbose": true
+    },
+    "orgId": "9119915c-22ba-4a82-a5c3-02d07bb6bc06",
+    "orgName": "tripcheck",
+    "userId": "FqnhVGD1xnHr76dZlC",
+    "userName": "tripcheck",
+    "serviceProviderAwsAccountId": "725123744386",
+    "serviceProviderAwsCfStackName": "tripcheck-service-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:ap-northeast-1:725123744386:stack/tripcheck-service-dev/9cea10c0-4377-11f0-970c-0a3868b57dcb",
+    "serviceProviderAwsCfStackCreated": "2025-06-07T08:15:46.281Z",
+    "serviceProviderAwsCfStackUpdated": "2025-07-01T15:09:38.212Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_ROLLBACK_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "GetDashmapLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-get-map:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-GetDashmapLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "UpdateDashplanLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-update-plan:2",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-UpdateDashplanLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "HttpApiId",
+        "OutputValue": "x04rjrapr6",
+        "Description": "Id of the HTTP API",
+        "ExportName": "sls-tripcheck-service-dev-HttpApiId"
+      },
+      {
+        "OutputKey": "DeleteDashplanLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-delete-plan:20",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-DeleteDashplanLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetDashplanDashbyDashidLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-get-plan-by-id:21",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-GetDashplanDashbyDashidLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetDashplanLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-get-plan:23",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-GetDashplanLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "tripcheck-deployment-dev",
+        "ExportName": "sls-tripcheck-service-dev-ServerlessDeploymentBucketName"
+      },
+      {
+        "OutputKey": "CreateDashplanLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-northeast-1:725123744386:function:tripcheck-service-dev-create-plan:20",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-tripcheck-service-dev-CreateDashplanLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "HttpApiUrl",
+        "OutputValue": "https://x04rjrapr6.execute-api.ap-northeast-1.amazonaws.com",
+        "Description": "URL of the HTTP API",
+        "ExportName": "sls-tripcheck-service-dev-HttpApiUrl"
+      }
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "GetDashplanLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan"
+          }
+        },
+        "GetDashplanDashbyDashidLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-plan-by-id"
+          }
+        },
+        "CreateDashplanLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-create-plan"
+          }
+        },
+        "UpdateDashplanLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-update-plan"
+          }
+        },
+        "DeleteDashplanLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-delete-plan"
+          }
+        },
+        "GetDashmapLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/tripcheck-service-dev-get-map"
+          }
+        },
+        "IamRoleLambdaExecution": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Policies": [
+              {
+                "PolicyName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "tripcheck-service",
+                      "dev",
+                      "lambda"
+                    ]
+                  ]
+                },
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:CreateLogStream",
+                        "logs:CreateLogGroup",
+                        "logs:TagResource"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tripcheck-service-dev*:*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "dynamodb:DescribeTable",
+                        "dynamodb:Query",
+                        "dynamodb:Scan",
+                        "dynamodb:GetItem",
+                        "dynamodb:PutItem",
+                        "dynamodb:UpdateItem",
+                        "dynamodb:DeleteItem"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "PlanTable",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "Path": "/",
+            "RoleName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "tripcheck-service",
+                  "dev",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "lambdaRole"
+                ]
+              ]
+            }
+          }
+        },
+        "GetDashplanLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan.zip"
+            },
+            "Handler": "src/functions/get-plan.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-get-plan",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "GetDashplanLogGroup"
+          ]
+        },
+        "GetDashplanDashbyDashidLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-plan-by-id.zip"
+            },
+            "Handler": "src/functions/get-plan-by-id.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-get-plan-by-id",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "GetDashplanDashbyDashidLogGroup"
+          ]
+        },
+        "CreateDashplanLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/create-plan.zip"
+            },
+            "Handler": "src/functions/create-plan.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-create-plan",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "CreateDashplanLogGroup"
+          ]
+        },
+        "UpdateDashplanLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/update-plan.zip"
+            },
+            "Handler": "src/functions/create-plan.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-update-plan",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "UpdateDashplanLogGroup"
+          ]
+        },
+        "DeleteDashplanLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/delete-plan.zip"
+            },
+            "Handler": "src/functions/delete-plan.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-delete-plan",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "DeleteDashplanLogGroup"
+          ]
+        },
+        "GetDashmapLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "tripcheck-deployment-dev",
+              "S3Key": "serverless/tripcheck-service/dev/1751382751660-2025-07-01T15:12:31.660Z/get-map.zip"
+            },
+            "Handler": "src/functions/get-map.handler",
+            "Runtime": "nodejs22.x",
+            "FunctionName": "tripcheck-service-dev-get-map",
+            "MemorySize": 256,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "TABLE_NAME": "tripcheck-service-plans-dev",
+                "GOOGLE_MAPS_API_KEY": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            },
+            "ReservedConcurrentExecutions": 5
+          },
+          "DependsOn": [
+            "GetDashmapLogGroup"
+          ]
+        },
+        "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "GetDashplanLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "GetDashplanDashbyDashidLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "CreateDashplanLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "UpdateDashplanLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "DeleteDashplanLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "GetDashmapLambdaFunction"
+            },
+            "CodeSha256": "6gt2WUTivx7RYZY+PUwCfkHczTIyX7pPo6U8dNLJyBM="
+          }
+        },
+        "HttpApi": {
+          "Type": "AWS::ApiGatewayV2::Api",
+          "Properties": {
+            "Name": "dev-tripcheck-service",
+            "ProtocolType": "HTTP",
+            "CorsConfiguration": {
+              "AllowHeaders": [
+                "Content-Type",
+                "X-Amz-Date",
+                "Authorization",
+                "X-Api-Key",
+                "X-Amz-Security-Token",
+                "X-Amz-User-Agent",
+                "X-Amzn-Trace-Id"
+              ],
+              "AllowMethods": [
+                "OPTIONS",
+                "GET",
+                "POST",
+                "DELETE"
+              ],
+              "AllowOrigins": [
+                "*"
+              ]
+            }
+          }
+        },
+        "HttpApiStage": {
+          "Type": "AWS::ApiGatewayV2::Stage",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "StageName": "$default",
+            "AutoDeploy": true,
+            "DefaultRouteSettings": {
+              "DetailedMetricsEnabled": false
+            }
+          }
+        },
+        "GetDashplanLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "GetDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationGetDashplan": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "GetDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteGetV1Plans": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /v1/plans",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationGetDashplan"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationGetDashplan"
+        },
+        "GetDashplanDashbyDashidLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "GetDashplanDashbyDashidLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationGetDashplanDashbyDashid": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "GetDashplanDashbyDashidLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteGetV1PlansIdVar": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /v1/plans/{id}",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationGetDashplanDashbyDashid"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationGetDashplanDashbyDashid"
+        },
+        "CreateDashplanLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "CreateDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationCreateDashplan": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "CreateDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRoutePostV1Plans": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "POST /v1/plans",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationCreateDashplan"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationCreateDashplan"
+        },
+        "UpdateDashplanLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "UpdateDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationUpdateDashplan": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "UpdateDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRoutePostV1PlansIdVar": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "POST /v1/plans/{id}",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationUpdateDashplan"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationUpdateDashplan"
+        },
+        "DeleteDashplanLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "DeleteDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationDeleteDashplan": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "DeleteDashplanLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteDeleteV1PlansIdVar": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "DELETE /v1/plans/{id}",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationDeleteDashplan"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationDeleteDashplan"
+        },
+        "GetDashmapLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "GetDashmapLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationGetDashmap": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "GetDashmapLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteGetV1Maps": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "GET /v1/maps",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationGetDashmap"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationGetDashmap"
+        },
+        "PlanTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "tripcheck-service-plans-dev",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST"
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "tripcheck-deployment-dev",
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "GetDashplanLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "GetDashplanLambdaVersionPI5aWVKrLtSEAYGjzHemb2C07cmm2qaGQzN1bBg"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-GetDashplanLambdaFunctionQualifiedArn"
+          }
+        },
+        "GetDashplanDashbyDashidLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "GetDashplanDashbyDashidLambdaVersionG2g7aGyGTiULtwMuJveSejsp2TJj8CzQlOlHwX1RYgM"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-GetDashplanDashbyDashidLambdaFunctionQualifiedArn"
+          }
+        },
+        "CreateDashplanLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "CreateDashplanLambdaVersionN9hR6DaTbBf2zN9lFVlTfZZego6OwqkU2x5ts0Mc"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-CreateDashplanLambdaFunctionQualifiedArn"
+          }
+        },
+        "UpdateDashplanLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "UpdateDashplanLambdaVersionD4XnNyQ426AYB9QMZXJ01LoGuceRFctKOAZ5Xpa8Rw"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-UpdateDashplanLambdaFunctionQualifiedArn"
+          }
+        },
+        "DeleteDashplanLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "DeleteDashplanLambdaVersionRUC5tdyqDO8r1mUTJEJlW0X3WW6XUHZMxzNk1KI0Q"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-DeleteDashplanLambdaFunctionQualifiedArn"
+          }
+        },
+        "GetDashmapLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "GetDashmapLambdaVersiongEeqVILhiZHALTNJRficUXVDl2zviTPzVgojdvQ97QM"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-GetDashmapLambdaFunctionQualifiedArn"
+          }
+        },
+        "HttpApiId": {
+          "Description": "Id of the HTTP API",
+          "Value": {
+            "Ref": "HttpApi"
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-HttpApiId"
+          }
+        },
+        "HttpApiUrl": {
+          "Description": "URL of the HTTP API",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "HttpApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                }
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-tripcheck-service-dev-HttpApiUrl"
+          }
+        }
+      }
+    }
+  }
+}

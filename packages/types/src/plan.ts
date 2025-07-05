@@ -1,5 +1,9 @@
 import joi from 'joi'
 import { BaseEntity } from './base'
+import { PlanItem } from './plan-item'
+import { RouteSegment } from './route-segment'
+import { Tag } from './tag'
+import { Location } from './location'
 
 export type Plan = BaseEntity & {
   name: string
@@ -7,8 +11,21 @@ export type Plan = BaseEntity & {
   endDate: Date
   description?: string
   userId: string,
-  icon: string
+  advisability: boolean,
+  imageUrl?: string
 }
+
+export type FullPlan = Plan & {
+  planItems: (PlanItem & {
+    location: Location;
+    routeSegments: (RouteSegment & {
+      fromLocation?: Location;
+      toLocation?: Location;
+    })[];
+  })[];
+  tags: Tag[];
+};
+
 
 export const PlanValidator = joi.object<Plan>().keys({
   id: joi.string().optional(),
@@ -17,6 +34,7 @@ export const PlanValidator = joi.object<Plan>().keys({
   endDate: joi.date().required().min(joi.ref('startDate')),
   description: joi.string().max(1000).optional(),
   userId: joi.string().required(),
-  icon: joi.string().max(1000).optional(),
+  advisability: joi.boolean().required(),
+  imageUrl: joi.string().uri().max(1000).optional(),
 })
 

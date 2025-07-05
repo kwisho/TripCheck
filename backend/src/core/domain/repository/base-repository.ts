@@ -1,5 +1,5 @@
 import { BaseEntity } from '@trip-check/types'
-import { GetPagedResult } from '@trip-check/utils'
+import { GetPagedResult } from '@trip-check/utils/dist/response'
 
 /**
  * Abstract interface for a base repository.
