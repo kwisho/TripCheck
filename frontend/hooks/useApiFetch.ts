@@ -22,8 +22,6 @@ export function useApiFetch() {
           // レスポンスの文字列化→再パースして日付変換
           const res = formatResponseBodyRecursive<R>(JSON.stringify(response), allDateProps);
 
-          console.log(res);
-
           return res;
         }
       } catch (error: unknown) {

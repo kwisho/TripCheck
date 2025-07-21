@@ -4,10 +4,10 @@ import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { getCurrentUser } from '@/auth/auth';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useEffect, useState } from 'react';
-import { getCurrentUser } from '@/auth/auth';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
 export default function RootLayout() {
@@ -65,7 +65,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="plan" options={{ headerShown: false }} />

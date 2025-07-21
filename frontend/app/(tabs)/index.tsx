@@ -32,12 +32,10 @@ export default function DashboardScreen() {
   const handleSearch = useCallback(
     (searchQuery: string) => {
       setSearchQuery(searchQuery);
-      console.log('searchQuery:', searchQuery);
       if (searchQuery === '') {
         setPlans(originalPlans);
         return;
       } else {
-        console.log('plans:', plans);
         setPlans(
           originalPlans.filter((originalPlan) =>
             originalPlan.name.toLowerCase().includes(searchQuery)

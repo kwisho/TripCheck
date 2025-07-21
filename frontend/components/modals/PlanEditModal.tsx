@@ -1,15 +1,8 @@
-import { useMapApi } from '@/api/features/map';
-import {
-  AutocompleteParams,
-  AutocompletePrediction,
-  PlanItem,
-  RouteSegment,
-  TransportType,
-} from '@trip-check/types';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Button, RadioButton, Text, TextInput } from 'react-native-paper';
-import { DatePickerInput, TimePicker } from 'react-native-paper-dates';
+import { PlanItem } from '@trip-check/types';
+import React, { useCallback, useState } from 'react';
+import { Modal, StyleSheet, View } from 'react-native';
+import { Button, Text, TextInput } from 'react-native-paper';
+import { TimePicker } from 'react-native-paper-dates';
 import PlaceAutocompleteInput from '../PlaceAutocompleteInput';
 
 type Props = {
@@ -28,7 +21,6 @@ export default function PlanItemEditModal({
   const [locationStartDate, setLocationStartDate] = useState<Date>(new Date());
   const [locationEndDate, setLocationEndDate] = useState<Date>(new Date());
   const [description, setDescription] = useState<string>('');
-  console.log('planItem', planItem);
   const handlePlaceSelected = useCallback(() => {
     console.log('handlePlaceSelected');
   }, []);

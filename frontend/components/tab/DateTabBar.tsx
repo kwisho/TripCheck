@@ -1,7 +1,7 @@
+import { formatJapaneseDate } from '@trip-check/utils';
 import React from 'react';
-import { TouchableOpacity, View, FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { formatDate } from '@trip-check/utils';
 
 type DateTab = {
   date: Date;
@@ -14,9 +14,6 @@ type Props = {
 };
 
 export default function DateTabBar({ dates, onSelectDate, selectedDate }: Props) {
-  // console.log('dates', dates);
-  // console.log('selectedDate', selectedDate);
-
   const renderItem = ({ item }: { item: DateTab }) => {
     const isSelected = selectedDate === item.date;
 
@@ -26,7 +23,7 @@ export default function DateTabBar({ dates, onSelectDate, selectedDate }: Props)
         style={[styles.tabItem, isSelected && styles.tabItemSelected]}
       >
         <Text style={[styles.tabDate, isSelected && styles.tabDateSelected]}>
-          {formatDate(item.date)}
+          {formatJapaneseDate(item.date)}
         </Text>
       </TouchableOpacity>
     );
@@ -48,6 +45,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 12,
     paddingVertical: 8,
+    height: 60,
   },
   tabItem: {
     paddingHorizontal: 16,
@@ -55,6 +53,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#eee',
     marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabItemSelected: {
     backgroundColor: '#6200ee',

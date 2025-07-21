@@ -6,6 +6,7 @@ import PlanItemEditModal from '@/components/modals/PlanEditModal';
 import RouteEditModal from '@/components/modals/RouteEditModal';
 import DateTabBar from '@/components/tab/DateTabBar';
 import { FullPlan, PlanItem, RouteSegment } from '@trip-check/types';
+import { formatDate } from '@trip-check/utils';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -18,6 +19,7 @@ export default function PlanDetailScreen() {
   const { planId } = useLocalSearchParams<{ planId: string }>();
   const [plan, setPlan] = useState<FullPlan | null>(null);
   const [selectDate, setSelectDate] = useState<Date>(new Date());
+  const [selectedDataPlanItems, setSelectedDatePlanItems] = useState<FullPlan['planItems']>([]);
   const [dates, setDates] = useState<DateTab[]>([]);
 
   // 経路編集モーダルの開閉状態
@@ -37,6 +39,14 @@ export default function PlanDetailScreen() {
         .then((fetchedPlan) => {
           console.log('取得成功', fetchedPlan);
           setPlan(fetchedPlan);
+          setSelectDate(fetchedPlan.startDate);
+          setSelectedDatePlanItems(
+            fetchedPlan?.planItems.filter(
+              (item) =>
+                formatDate(item.locationStartDate) >= formatDate(fetchedPlan.startDate) &&
+                formatDate(item.locationEndDate) <= formatDate(fetchedPlan.startDate)
+            ) ?? []
+          );
           createDateList(fetchedPlan.startDate, fetchedPlan.endDate);
         })
         .catch((error) => {
@@ -48,23 +58,37 @@ export default function PlanDetailScreen() {
   }, [planId]);
 
   /** 日程の開始から終了までの配列を作成する */
-  const createDateList = useCallback((startDate: Date, endDate: Date): void => {
-    if (!startDate || !endDate) return;
-    const current = selectDate;
-    const planDates: DateTab[] = [];
-    while (current <= endDate) {
-      planDates.push({ date: new Date(current) });
-      current.setDate(current.getDate() + 1);
-    }
-    console.log('planDates', planDates);
-    setDates(planDates);
-  }, [plan?.startDate, plan?.endDate]);
+  const createDateList = useCallback(
+    (startDate: Date, endDate: Date): void => {
+      if (!startDate || !endDate) return;
+      const current = new Date(startDate);
+      const planDates: DateTab[] = [];
+      while (current <= endDate) {
+        planDates.push({ date: new Date(current) });
+        current.setDate(current.getDate() + 1);
+      }
+      setDates(planDates);
+    },
+    [plan?.startDate, plan?.endDate]
+  );
 
   /** 選択した日付のデータにリストを絞り込む */
-  const handleSelectDate = useCallback((selectDate: Date) => {
-    setSelectDate(selectDate);
-    console.log('handleSelectDate');
-  }, []);
+  const handleSelectDate = useCallback(
+    (date: Date) => {
+      setSelectDate(date);
+      setSelectedDatePlanItems(
+        plan?.planItems.filter(
+          (item) =>
+            formatDate(item.locationStartDate) >= formatDate(date) &&
+            formatDate(item.locationEndDate) <= formatDate(date)
+        ) ?? []
+      );
+      console.log('plan:', plan);
+      console.log('handleSelectDate:', date);
+      console.log('selectedDataPlanItems:', selectedDataPlanItems);
+    },
+    [plan]
+  );
 
   /**
    * 指定した routeSegment を plan の中で更新する
@@ -121,7 +145,6 @@ export default function PlanDetailScreen() {
             updateRouteSegment(updatedSegment); // ローカルステート更新
             setIsRouteEditModalOpen(false);
             setEditingRouteSegment(null);
-            // TODO: API反映が必要ならここで呼び出す
           }}
         />
       )}
@@ -133,7 +156,7 @@ export default function PlanDetailScreen() {
       <DateTabBar dates={dates} onSelectDate={handleSelectDate} selectedDate={selectDate} />
 
       {/* 各日程の旅程 & 経路一覧 */}
-      {plan?.planItems.map((planItem) => (
+      {selectedDataPlanItems.map((planItem) => (
         <View key={planItem.id}>
           {/* 旅程カード */}
           <PlanItemCard

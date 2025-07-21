@@ -2,7 +2,6 @@ import { Feather } from '@expo/vector-icons';
 import { Location, PlanItem } from '@trip-check/types';
 import { formatTime } from '@trip-check/utils';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button } from 'react-native-paper';
 
 type Props = {
   planItem: PlanItem;
