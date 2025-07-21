@@ -1,6 +1,8 @@
+import { Feather } from '@expo/vector-icons';
 import { Location, PlanItem } from '@trip-check/types';
 import { formatTime } from '@trip-check/utils';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button } from 'react-native-paper';
 
 type Props = {
   planItem: PlanItem;
@@ -15,9 +17,12 @@ export default function PlanItemCard({ planItem, location, onEdit }: Props) {
       <View style={styles.header}>
         <Text style={styles.title}>{location.name}</Text>
         {onEdit && (
-          <Text style={styles.editText} onPress={onEdit}>
-            Edit
-          </Text>
+          <TouchableOpacity style={styles.editButton}>
+            <Feather name="edit-2" size={16} color="gray" />
+            <Text style={styles.editText} onPress={onEdit}>
+              Edit
+            </Text>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -27,6 +32,8 @@ export default function PlanItemCard({ planItem, location, onEdit }: Props) {
           {formatTime(planItem.locationStartDate)} 〜 {formatTime(planItem.locationEndDate)}
         </Text>
       </View>
+
+      <Text />
 
       {/* 説明 */}
       {planItem.description ? <Text style={styles.note}>{planItem.description}</Text> : null}
@@ -48,6 +55,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: { fontSize: 16, fontWeight: 'bold' },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderRadius: 8,
+  },
   editText: { color: 'gray', fontSize: 14 },
   row: {
     flexDirection: 'row',

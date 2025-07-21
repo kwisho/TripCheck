@@ -4,7 +4,6 @@ import { BaseEntity } from './base'
 export type PlanItemTag = BaseEntity & {
   /** 関連付ける旅程のID */
   planId: string
-
   /** 関連付けるタグのID */
   tagId: string
 }

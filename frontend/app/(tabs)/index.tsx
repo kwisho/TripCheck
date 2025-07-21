@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   addButton: {
     position: 'absolute',
     right: 20,
-    bottom: 20,
+    bottom: 40,
     backgroundColor: 'white',
   },
 });

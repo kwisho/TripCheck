@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   },
   /** マップ・経路 */
   map: {
-    fetchDistance: () => `/maps`,
+    fetchDistance: () => `/maps/get-map-distance`,
+    fetchAutocomplete: () => `/maps/get-map-autocomplete`,
   },
 };

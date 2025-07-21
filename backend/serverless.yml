@@ -125,12 +125,27 @@ functions:
               issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
 
   # Map
-  get-map:
-    handler: src/functions/get-map.handler
+  get-map-distance:
+    handler: src/functions/get-map-distance.handler
     reservedConcurrency: 5
     events:
       - httpApi:
-          path: /v1/maps
+          path: /v1/maps/get-map-distance
+          method: get
+          authorizers:
+            TripCheckJwtAuthorizer:
+              type: jwt
+              identitySource: $request.header.Authorization
+              audience:
+                - 74mtj0sj8kpi7bckr84o2fskie
+              issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_fd8pKPCYd
+
+  get-map-autocomplete:
+    handler: src/functions/get-map-autocomplete.handler
+    reservedConcurrency: 5
+    events:
+      - httpApi:
+          path: /v1/maps/get-map-autocomplete
           method: get
           authorizers:
             TripCheckJwtAuthorizer:

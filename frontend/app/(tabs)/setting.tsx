@@ -1,7 +1,8 @@
+import { navigate } from 'expo-router/build/global-state/routing';
 import { StyleSheet, View } from 'react-native';
 import { Avatar, Button, Text } from 'react-native-paper';
 
-export default function AccountScreen() {
+export default function SettingScreen() {
   return (
     <View style={styles.container}>
       {/* ユーザーアイコン */}
@@ -27,7 +28,7 @@ export default function AccountScreen() {
       </Button>
 
       {/* 設定へ遷移 */}
-      <Button mode="outlined" onPress={() => console.log('設定画面へ')} style={styles.button}>
+      <Button mode="outlined" onPress={() => navigate('/setting/account')} style={styles.button}>
         設定
       </Button>
     </View>

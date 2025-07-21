@@ -1,11 +1,7 @@
 {
   "editor.codeActionsOnSave": {
-    // ファイル保存時にESLintの自動修正を実行します
-    // formatOnSaveがtrueだと、保存時にPrettierが実行されるが、ESLintは実行されない。
-    // ESLintの自動修正を実行したい場合は、codeActionsOnSaveを設定する。
-    // https://qiita.com/keitaMax/items/f8af4bb1e7eccfd3bbc9
     "source.fixAll.eslint": "explicit",
-    "source.organizeImports": true 
+    "source.organizeImports": "explicit"
   },
 
   "editor.tabSize": 4,

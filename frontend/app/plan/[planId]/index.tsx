@@ -2,21 +2,31 @@ import { usePlanApi } from '@/api/features/plan';
 import { PlanCard } from '@/components/cards/PlanCard';
 import PlanItemCard from '@/components/cards/PlanItemCard';
 import PlanRouteCard from '@/components/cards/PlanRouteCard';
+import PlanItemEditModal from '@/components/modals/PlanEditModal';
 import RouteEditModal from '@/components/modals/RouteEditModal';
-import { FullPlan, RouteSegment } from '@trip-check/types';
+import DateTabBar from '@/components/tab/DateTabBar';
+import { FullPlan, PlanItem, RouteSegment } from '@trip-check/types';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+
+type DateTab = {
+  date: Date;
+};
 
 export default function PlanDetailScreen() {
   const { planId } = useLocalSearchParams<{ planId: string }>();
   const [plan, setPlan] = useState<FullPlan | null>(null);
+  const [selectDate, setSelectDate] = useState<Date>(new Date());
+  const [dates, setDates] = useState<DateTab[]>([]);
 
   // 経路編集モーダルの開閉状態
   const [isRouteEditModalOpen, setIsRouteEditModalOpen] = useState(false);
+  const [isPlanItemEditModalOpen, setIsPlanItemEditModalOpen] = useState(false);
 
   // 編集対象のルート情報（nullの場合はモーダルを開かない）
   const [editingRouteSegment, setEditingRouteSegment] = useState<RouteSegment | null>(null);
+  const [editingPlanItem, setEditingPlanItem] = useState<PlanItem | null>(null);
 
   const { getPlan } = usePlanApi();
 
@@ -27,6 +37,7 @@ export default function PlanDetailScreen() {
         .then((fetchedPlan) => {
           console.log('取得成功', fetchedPlan);
           setPlan(fetchedPlan);
+          createDateList(fetchedPlan.startDate, fetchedPlan.endDate);
         })
         .catch((error) => {
           console.error('取得失敗', error);
@@ -34,6 +45,25 @@ export default function PlanDetailScreen() {
     } else {
       setPlan(null);
     }
+  }, [planId]);
+
+  /** 日程の開始から終了までの配列を作成する */
+  const createDateList = useCallback((startDate: Date, endDate: Date): void => {
+    if (!startDate || !endDate) return;
+    const current = selectDate;
+    const planDates: DateTab[] = [];
+    while (current <= endDate) {
+      planDates.push({ date: new Date(current) });
+      current.setDate(current.getDate() + 1);
+    }
+    console.log('planDates', planDates);
+    setDates(planDates);
+  }, [plan?.startDate, plan?.endDate]);
+
+  /** 選択した日付のデータにリストを絞り込む */
+  const handleSelectDate = useCallback((selectDate: Date) => {
+    setSelectDate(selectDate);
+    console.log('handleSelectDate');
   }, []);
 
   /**
@@ -59,8 +89,25 @@ export default function PlanDetailScreen() {
     });
   };
 
+  /** PlanItemを含めたPlanを保存する */
+  const handlePlanSave = useCallback(() => {
+    console.log('handlePlanSave');
+  }, []);
+
   return (
     <View style={[styles.container]}>
+      {/* 旅程詳細編集モーダル（対象があれば表示） */}
+      {editingPlanItem && (
+        <PlanItemEditModal
+          planItem={editingPlanItem}
+          onDismiss={() => {
+            setIsPlanItemEditModalOpen(false);
+            setEditingPlanItem(null);
+          }}
+          onSave={handlePlanSave}
+          isPlanEditModalOpen={isPlanItemEditModalOpen}
+        />
+      )}
       {/* 経路編集モーダル（対象があれば表示） */}
       {editingRouteSegment && (
         <RouteEditModal
@@ -82,11 +129,21 @@ export default function PlanDetailScreen() {
       {/* プラン概要カード */}
       <PlanCard plan={plan ?? null} />
 
+      {/* 日程リストタブ */}
+      <DateTabBar dates={dates} onSelectDate={handleSelectDate} selectedDate={selectDate} />
+
       {/* 各日程の旅程 & 経路一覧 */}
       {plan?.planItems.map((planItem) => (
         <View key={planItem.id}>
           {/* 旅程カード */}
-          <PlanItemCard planItem={planItem} location={planItem.location} />
+          <PlanItemCard
+            planItem={planItem}
+            location={planItem.location}
+            onEdit={() => {
+              setEditingPlanItem(planItem);
+              setIsPlanItemEditModalOpen(true);
+            }}
+          />
 
           {/* 経路カード一覧 */}
           {planItem.routeSegments?.map((routeSegment) => (
