@@ -1,13 +1,15 @@
-import { PlanItem } from '@trip-check/types';
-import React, { useCallback, useState } from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
+import { AutocompletePrediction, Location, PlanItem } from '@trip-check/types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Modal, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Text, TextInput } from 'react-native-paper';
 import { TimePicker } from 'react-native-paper-dates';
 import PlaceAutocompleteInput from '../PlaceAutocompleteInput';
+import { formatJapaneseDate } from '@trip-check/utils';
 
 type Props = {
-  planItem: PlanItem;
+  planItem: PlanItem & { location: Location };
   isPlanEditModalOpen: boolean;
+  selectDate: Date;
   onSave: (updated: PlanItem) => void;
   onDismiss: () => void;
 };
@@ -15,15 +17,38 @@ type Props = {
 export default function PlanItemEditModal({
   planItem,
   isPlanEditModalOpen,
+  selectDate,
   onDismiss,
   onSave,
 }: Props) {
   const [locationStartDate, setLocationStartDate] = useState<Date>(new Date());
   const [locationEndDate, setLocationEndDate] = useState<Date>(new Date());
   const [description, setDescription] = useState<string>('');
-  const handlePlaceSelected = useCallback(() => {
-    console.log('handlePlaceSelected');
+  const [selectedPlace, setSelectedPlace] = useState<AutocompletePrediction>();
+  console.log('selectedPlace ', selectedPlace);
+  useEffect(() => {
+    setLocationStartDate(planItem.locationStartDate);
+    setLocationEndDate(planItem.locationEndDate);
+    setDescription(planItem.description || '');
+    setSelectedPlace({
+      description: planItem.location.name,
+      place_id: planItem.locationId,
+    });
+  }, [planItem]);
+
+  const handlePlaceSelected = useCallback((placeName: AutocompletePrediction) => {
+    setSelectedPlace(placeName);
   }, []);
+
+  const handleSave = () => {
+    onSave({
+      ...planItem,
+      locationStartDate: locationStartDate,
+      locationEndDate: locationEndDate,
+      description,
+      locationId: selectedPlace?.place_id as string,
+    });
+  };
 
   return (
     <Modal
@@ -34,56 +59,74 @@ export default function PlanItemEditModal({
     >
       <View style={styles.backdrop}>
         <View style={styles.container}>
-          <Text style={styles.title}>行き先を編集</Text>
+          <ScrollView>
+            <Text style={styles.title}>行き先を編集 {formatJapaneseDate(selectDate)}</Text>
 
-          <PlaceAutocompleteInput label="行き先" onPlaceSelected={handlePlaceSelected} />
+            <PlaceAutocompleteInput label="行き先" onPlaceSelected={handlePlaceSelected} />
 
-          {/* 活動開始日時（日付単位） */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 16,
+              }}
+            >
+              {/* 開始時間 */}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>開始時間</Text>
+                <TimePicker
+                  inputType="keyboard"
+                  focused="hours"
+                  hours={locationStartDate.getHours()}
+                  minutes={locationStartDate.getMinutes()}
+                  onFocusInput={() => {}}
+                  onChange={({ hours, minutes }) => {
+                    const newDate = new Date(locationStartDate);
+                    newDate.setHours(hours);
+                    newDate.setMinutes(minutes);
+                    setLocationStartDate(newDate);
+                  }}
+                />
+              </View>
 
-          <TimePicker
-            inputType={'keyboard'}
-            focused={'hours'}
-            hours={0}
-            minutes={0}
-            onFocusInput={() => {}}
-            onChange={({ hours, minutes }) => {
-              const newDate = new Date(locationStartDate);
-              newDate.setHours(hours);
-              newDate.setMinutes(minutes);
-              setLocationStartDate(newDate);
-            }}
-          />
+              <Text style={{ fontSize: 18, marginHorizontal: 8 }}>〜</Text>
 
-          {/* 活動終了日時（日付単位） */}
+              {/* 終了時間 */}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>終了時間</Text>
+                <TimePicker
+                  inputType="keyboard"
+                  focused="hours"
+                  hours={locationEndDate.getHours()}
+                  minutes={locationEndDate.getMinutes()}
+                  onFocusInput={() => {}}
+                  onChange={({ hours, minutes }) => {
+                    const newDate = new Date(locationEndDate);
+                    newDate.setHours(hours);
+                    newDate.setMinutes(minutes);
+                    setLocationEndDate(newDate);
+                  }}
+                />
+              </View>
+            </View>
 
-          <TimePicker
-            inputType={'keyboard'}
-            focused={'hours'}
-            hours={0}
-            minutes={0}
-            onFocusInput={() => {}}
-            onChange={({ hours, minutes }) => {
-              const newDate = new Date(locationEndDate);
-              newDate.setHours(hours);
-              newDate.setMinutes(minutes);
-              setLocationEndDate(newDate);
-            }}
-          />
+            <Text style={styles.label}>活動内容の詳細説明（任意）</Text>
+            <TextInput
+              label="活動内容の詳細説明"
+              multiline
+              style={styles.input}
+              value={description}
+              onChangeText={setDescription}
+            />
 
-          {/* 活動内容の詳細説明（任意） */}
-          <TextInput
-            label="活動内容の詳細説明"
-            style={styles.input}
-            value={description}
-            onChangeText={setDescription}
-          />
-
-          <View style={styles.buttonRow}>
-            <Button onPress={onDismiss}>キャンセル</Button>
-            <Button mode="contained" onPress={() => onSave}>
-              保存
-            </Button>
-          </View>
+            <View style={styles.buttonRow}>
+              <Button onPress={onDismiss}>キャンセル</Button>
+              <Button mode="contained" onPress={handleSave}>
+                保存
+              </Button>
+            </View>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -101,40 +144,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
+    maxHeight: '90%',
   },
   title: {
     textAlign: 'center',
     fontSize: 22,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   label: {
-    marginTop: 12,
+    fontSize: 14,
+    marginTop: 16,
     marginBottom: 4,
-    fontSize: 14,
-  },
-  radioGroup: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-    gap: 4,
-    border: 1,
-  },
-  radioItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  radioLabel: {
-    fontSize: 14,
   },
   input: {
-    marginBottom: 8,
+    marginBlock: 8,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 16,
-    gap: 8,
+    marginTop: 24,
+    gap: 12,
   },
 });

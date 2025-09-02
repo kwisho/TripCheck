@@ -15,7 +15,7 @@ type Props = {
 
 export default function DateTabBar({ dates, onSelectDate, selectedDate }: Props) {
   const renderItem = ({ item }: { item: DateTab }) => {
-    const isSelected = selectedDate === item.date;
+    const isSelected = selectedDate.getDate() === item.date.getDate();
 
     return (
       <TouchableOpacity

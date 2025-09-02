@@ -15,7 +15,7 @@ import { BaseDynamoRepository } from './base-dynamodb-repository.js'
  * @see Plan
  */
 
-export class PlanRepository extends BaseDynamoRepository<Plan> implements IPlanRepository {
+export class PlanRepository extends BaseDynamoRepository<FullPlan> implements IPlanRepository {
   constructor(ddbDocumentClient: DynamoDBDocumentClient = ddb) {
     super(ddbDocumentClient, 'user')
   }

@@ -1,5 +1,7 @@
 import joi from 'joi'
 import { BaseEntity } from './base'
+import { Location } from './location'
+import { RouteSegment } from './route-segment'
 
 export type PlanItem = BaseEntity & {
   /** 所属する旅程プランのID */
@@ -12,6 +14,11 @@ export type PlanItem = BaseEntity & {
   locationEndDate: Date
   /** 活動内容の詳細説明（任意） */
   description?: string
+}
+
+export type FullPlanItem = PlanItem & {
+  location: Location;
+  routeSegments: RouteSegment[];
 }
 
 export const PlanItemValidator = joi.object<PlanItem>().keys({

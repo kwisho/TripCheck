@@ -1,7 +1,13 @@
-import { Plan } from '@trip-check/types'
-import { IBaseRepository } from '../repository/base-repository.js'
+import { FullPlan, Plan } from '@trip-check/types'
 import { GetPagedResult, ValidateableResponse } from '@trip-check/utils'
-export interface IPlanRepository extends IBaseRepository<Plan> {
+import { IBaseRepository, UpdateModel } from '../repository/base-repository'
+
+export interface IPlanRepository extends IBaseRepository<FullPlan> {
+  get(id: string): Promise<FullPlan | undefined>
+  create(plan: FullPlan): Promise<FullPlan>
+  update(id: string, entity: FullPlan, updateModel?: UpdateModel): Promise<FullPlan>
+  delete(id: string): Promise<boolean>
+
   getPagedByFilters(
     userId: string,
     startDate?: Date,
@@ -11,17 +17,22 @@ export interface IPlanRepository extends IBaseRepository<Plan> {
     nextToken?: string,
   ): Promise<GetPagedResult<Plan>>
 }
+
 export interface IPlanService {
+  get(userId: string, id: string): Promise<ValidateableResponse<FullPlan>>
+
+  create(userId: string, input: FullPlan): Promise<ValidateableResponse<FullPlan>>
+
+  update(userId: string, id: string, input: FullPlan): Promise<ValidateableResponse<FullPlan>>
+
+  delete(userId: string, id: string): Promise<ValidateableResponse<boolean>>
+
   getPaged(
     userId: string,
-    startDate: Date,
-    endDate: Date,
-    advisability: boolean | null,
-    count: number,
-    nextToken: string | undefined,
+    startDate?: Date,
+    endDate?: Date,
+    advisability?: boolean | null,
+    count?: number,
+    nextToken?: string,
   ): Promise<ValidateableResponse<GetPagedResult<Plan>>>
-  get(id: string): Promise<ValidateableResponse<Plan>>
-  create(input: Plan): Promise<ValidateableResponse<Plan>>
-  update(id: string, input: Plan): Promise<ValidateableResponse<Plan>>
-  delete(id: string): Promise<ValidateableResponse<boolean>>
 }

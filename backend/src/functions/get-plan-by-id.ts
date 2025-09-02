@@ -23,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     const planService: IPlanService = new PlanService()
-    const result = await planService.get(id)
+    const result = await planService.get(userId, id)
 
     console.log('result:', result)
 

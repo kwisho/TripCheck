@@ -20,7 +20,7 @@ export default [
                 path.join(__dirname, 'backend/tsconfig.json'),
                 path.join(__dirname, 'packages/types/tsconfig.json'),
             ],
-            tsconfigRootDir: new URL('.', import.meta.url),
+            tsconfigRootDir: __dirname,
             ecmaFeatures: {
                 jsx: true,
             },

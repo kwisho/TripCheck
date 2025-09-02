@@ -1,4 +1,4 @@
-import { Plan, PlanValidator } from '@trip-check/types'
+import { FullPlan, Plan, PlanValidator } from '@trip-check/types'
 import { GetPagedResult, ValidateableResponse } from '@trip-check/utils'
 import { IPlanRepository, IPlanService } from '../domain/model/plan.js'
 import { PlanRepository } from '../infrastructure/repositories/plan-repository.js'
@@ -6,10 +6,9 @@ import { PlanRepository } from '../infrastructure/repositories/plan-repository.j
 export class PlanService implements IPlanService {
   constructor(private readonly planRepository: IPlanRepository = new PlanRepository()) {}
 
-  public async get(id: string): Promise<ValidateableResponse<Plan>> {
-    console.log('PlanService.get called with id')
+  public async get(userId: string, id: string): Promise<ValidateableResponse<FullPlan>> {
     const model = await this.planRepository.get(id)
-    if (!model) {
+    if (!model || model.userId !== userId) {
       return {
         errors: [`There is not a plan for the id '${id}'.`],
       }
@@ -17,36 +16,49 @@ export class PlanService implements IPlanService {
     return { model }
   }
 
-  public async create(input: Plan): Promise<ValidateableResponse<Plan>> {
-    // validate the plan object
-    const validation = PlanValidator.validate(input)
-
-    if (validation.error) {
-      const errors = validation.error.details.map((x) => x.message)
-      return { errors }
-    }
-
-    // create the plan on the database
-    const model = await this.planRepository.create(input)
-    return { model }
-  }
-
-  public async update(id: string, input: Plan): Promise<ValidateableResponse<Plan>> {
+  public async create(userId: string, input: FullPlan): Promise<ValidateableResponse<FullPlan>> {
     const validation = PlanValidator.validate(input)
     if (validation.error) {
       const errors = validation.error.details.map((x) => x.message)
       return { errors }
     }
-    const model = await this.planRepository.update(id, input)
+
+    // 明示的に userId を埋め込む（セキュリティ確保）
+    const planToCreate: FullPlan = {
+      ...input,
+      userId,
+    }
+
+    const model = await this.planRepository.create(planToCreate)
     return { model }
   }
 
-  public async delete(id: string): Promise<ValidateableResponse<boolean>> {
+  public async update(userId: string, id: string, input: FullPlan): Promise<ValidateableResponse<FullPlan>> {
+    const validation = PlanValidator.validate(input)
+    if (validation.error) {
+      const errors = validation.error.details.map((x) => x.message)
+      return { errors }
+    }
+
+    const existing = await this.planRepository.get(id)
+    if (!existing || existing.userId !== userId) {
+      return { errors: [`You do not have permission to update this plan.`] }
+    }
+
+    const updated = await this.planRepository.update(id, input)
+
+    return { model: updated }
+  }
+  public async delete(userId: string, id: string): Promise<ValidateableResponse<boolean>> {
+    const existing = await this.planRepository.get(id)
+    if (!existing || existing.userId !== userId) {
+      return { errors: [`You do not have permission to delete this plan.`] }
+    }
+
     const result = await this.planRepository.delete(id)
     return { model: result }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async getPaged(
     userId: string,
     startDate?: Date,
@@ -55,54 +67,17 @@ export class PlanService implements IPlanService {
     count?: number,
     nextToken?: string,
   ): Promise<ValidateableResponse<GetPagedResult<Plan>>> {
-    console.log(`Starting checking Plans`)
-    console.log(userId)
-    console.log(startDate)
-    console.log(endDate)
-    console.log(advisability)
-    console.log(count)
-    console.log(nextToken)
-
-    // const plans = await this.planRepository.getPlans(userId)
-    const plans: Plan[] = [
-      {
-        id: '1',
-        name: '北海道ドライブ旅行',
-        startDate: new Date('2025-05-01'),
-        endDate: new Date('2025-05-05'),
-        description: '札幌から函館までの絶景ドライブ',
-        userId: 'user123',
-        advisability: true,
-        imageUrl: 'https://picsum.photos/200/300',
-      },
-      {
-        id: '2',
-        name: 'ランニングマラソン',
-        startDate: new Date('2024-05-02'),
-        endDate: new Date('2024-05-03'),
-        description: '東京で行われる市民マラソンに参加',
-        userId: 'user123',
-        advisability: false,
-        imageUrl: 'https://picsum.photos/200/300',
-      },
-      {
-        id: '3',
-        name: '富士山ハイキング',
-        startDate: new Date('2024-04-10'),
-        endDate: new Date('2024-04-11'),
-        description: '富士山周辺をゆったりハイキング',
-        userId: 'user123',
-        advisability: true,
-        imageUrl: 'https://picsum.photos/200/300',
-      },
-    ]
-
+    console.log('PlanService.getPaged called')
+    const result = await this.planRepository.getPagedByFilters(
+      userId,
+      startDate,
+      endDate,
+      advisability ?? undefined,
+      count,
+      nextToken,
+    )
     return {
-      model: {
-        items: plans,
-        count: plans.length,
-        nextToken: undefined, // ページング未対応の場合は undefined のままでOK
-      },
+      model: result,
     }
   }
 }
